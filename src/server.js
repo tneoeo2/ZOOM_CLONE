@@ -34,7 +34,14 @@ wss.on("connection", (socket) =>{
 
 server.listen(3000, handleListen);
 
-
+{
+    type:"message";
+    payload:"hello everyone!";
+}
+{
+type:"nickname";
+payload:"hey";
+}
 
 //nodemon  ignore 설정으로 server 수정시에만 서버 새로고침되게 변경
 //server.js    node(backend에서 구동되는 코드)
