@@ -25,10 +25,19 @@ const sockets = [];
 //socket : 브라우저로의 연결
 wss.on("connection", (socket) =>{
     sockets.push(socket);
+    socket["nickname"] = "Anon"; //닉네임X 사람들 기본설정
     console.log("Connected to Browser!");
     socket.on("close", onSocketClose); //서버 닫혔을때 실행
-    socket.on("message", (message)=>{
-        sockets.forEach(aSocket => aSocket.send(message.toString("utf-8")));    //sockets안의 브라우저에게 모두 메시지 전송
+    socket.on("message", (msg)=>{
+        const message = JSON.parse(msg.toString("utf-8"));
+        switch(message.type){   //type가 new_message일때만 모든 브라우저에 보이기 => 닉네임은 안뜨게 처리
+            case "new_message":
+                sockets.forEach((aSocket) => aSocket.send(`${socket.nickname}: ${message.payload}`));    //sockets안의 브라우저에게 모두 메시지 전송
+                break;
+            case "nickname":
+                socket["nickname"] = message.payload;   //socket에 새로운 아이템 추가(socket안에 데이터 저장가능)
+                break;
+        }
     });      //브라우저에서 보내기
 });
 
