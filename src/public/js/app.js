@@ -20,6 +20,7 @@ function handleClose(){
 socket.addEventListener("message", (message)=>{    //메시지 입력되면 li 태그 생성하여 추가
     const li = document.createElement("li");
     li.innerText = message.data;
+    li.innerText = `You: ${input.value}`;    //서버에서 메시지 보내기
     messageList.append(li);
 });
 
@@ -44,3 +45,7 @@ messageForm.addEventListener('submit', handleSubmit);
 nickForm.addEventListener('submit', handleNickSubmit);
 
 
+
+////! 생각해볼 사항
+// 서버에서 알림용 메시지 보내기 (전체 브라우저에 공지?  ex) ??님이 참여하였습니다
+// 서버에서 메시지보낼때 JSON stringfy와 app의 parse 문젲
