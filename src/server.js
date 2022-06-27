@@ -1,5 +1,5 @@
 import http from "http";
-import WebSocket, {WebSocketServer} from "ws";
+import SocketIO from "socket.io";
 import express from "express";   //express view 설정, render해주는 역할
 
 const app = express();
@@ -12,16 +12,21 @@ app.get("/*", (req, res) => res.redirect("/"));  //home 외의 나머지 주소 
 const handleListen = () => console.log('Lintening on http://localhost:3000');   //? ws://localhost:3000  => ws / http 요청 둘 다 처리 가능
 // app.listen(3000, handleListen); 
 
-const server = http.createServer(app);      //express app로부터 서버 만들기   //? httpServer
+const httpserver = http.createServer(app);      //express app로부터 서버 만들기   //? httpServer
+const wsServer = SocketIO(httpserver);   //socket.io는 websocket의 부가기능이 아니다!!
+
+wsServer.on("connection", (socket) => {
+    socket.on("enter_room", (msg, done) => {    //done(client단에서 전달받은 func)
+        console.log(msg);
+        setTimeout(() => {
+            done();   //server에서 done함수 호출 => frontend에서 함수 실행
+        }, 5000);
+    });
+});
+
+/*
 const wss = new WebSocketServer({ server }); //?websocketServer    ==> websocker 서버 && httpServer 둘다 돌릴 수 있다!!
-
-
-function onSocketClose(){
-    console.log("Disconnected from the Browser X");
-}
-
 const sockets = [];
-
 //socket : 브라우저로의 연결
 wss.on("connection", (socket) =>{
     sockets.push(socket);
@@ -40,8 +45,8 @@ wss.on("connection", (socket) =>{
         }
     });      //브라우저에서 보내기
 });
-
-server.listen(3000, handleListen);
+ */
+httpserver.listen(3000, handleListen);
 
 {
     type:"message";
