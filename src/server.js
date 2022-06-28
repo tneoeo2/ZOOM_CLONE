@@ -20,14 +20,9 @@ wsServer.on("connection", (socket) => {
         console.log(`Socket Event: ${event}`);
     });
     socket.on("enter_room", (roomName, done) => {    //done(client단에서 전달받은 func)
-        console.log(socket.id); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
-        console.log(socket.rooms);
+        // console.log(socket.id); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
         socket.join(roomName);
-        console.log(socket.rooms);
-
-        setTimeout(() => {
-            done("hello from the backend");   //server에서 done함수 호출 => frontend에서 함수 실행
-        }, 5000);
+        done();   //함수 호출(show room!!)
     });
 });
 
