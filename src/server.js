@@ -16,8 +16,15 @@ const httpserver = http.createServer(app);      //express app로부터 서버 �
 const wsServer = SocketIO(httpserver);   //socket.io는 websocket의 부가기능이 아니다!!
 
 wsServer.on("connection", (socket) => {
+    socket.onAny((event)=>{
+        console.log(`Socket Event: ${event}`);
+    });
     socket.on("enter_room", (roomName, done) => {    //done(client단에서 전달받은 func)
-        console.log(roomName);
+        console.log(socket.id); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
+        console.log(socket.rooms);
+        socket.join(roomName);
+        console.log(socket.rooms);
+
         setTimeout(() => {
             done("hello from the backend");   //server에서 done함수 호출 => frontend에서 함수 실행
         }, 5000);
