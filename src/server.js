@@ -23,6 +23,7 @@ wsServer.on("connection", (socket) => {
         // console.log(socket.id); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
         socket.join(roomName);
         done();   //함수 호출(show room!!)
+        wsServer.to(roomName).emit("welcome");   //roomName의 모든사람에게 emit
     });
 });
 
