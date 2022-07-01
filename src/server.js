@@ -17,6 +17,7 @@ const httpserver = http.createServer(app);      //express app로부터 서버 �
 const wsServer = SocketIO(httpserver);   //socket.io는 websocket의 부가기능이 아니다!!
 
 wsServer.on("connection", (socket) => {
+    socket["nickname"] = "Anon";
     socket.onAny((event)=>{
         console.log(`Socket Event: ${event}`);
     });
@@ -24,15 +25,18 @@ wsServer.on("connection", (socket) => {
         // console.log(socket.id); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
         socket.join(roomName);
         done();   //함수 호출(show room!!)
-        socket.to(roomName).emit("welcome");   //roomName의 모든사람에게 emit
+        socket.to(roomName).emit("welcome", socket.nickname);   //roomName의 모든사람에게 emit
     });
     socket.on("disconnecting", () => {
-        socket.rooms.forEach(room => socket.to(room).emit("bye")); //모든 sockt disconnect시 모든 rooms에 bye 전송
+        socket.rooms.forEach(room => 
+            socket.to(room).emit("bye", socket.nickname)
+            ); //모든 sockt disconnect시 모든 rooms에 bye 전송
     })
     socket.on("new_message", (msg, room, done) => {
-        socket.to(room).emit("new_message", msg);
+        socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
         done();
     })
+    socket.on("nickname", (nickname) => (socket["nickname"] = nickname));  //nickname 이벤트 발생시 nickname 받아오서 socket{"nickname"}에 등록
 });
 
 /*
