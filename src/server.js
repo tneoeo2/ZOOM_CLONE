@@ -1,6 +1,7 @@
 import http from "http";
 import SocketIO from "socket.io";
 import express from "express";   //express view 설정, render해주는 역할
+import { SocketAddress } from "net";
 
 const app = express();
 
@@ -23,8 +24,15 @@ wsServer.on("connection", (socket) => {
         // console.log(socket.id); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
         socket.join(roomName);
         done();   //함수 호출(show room!!)
-        wsServer.to(roomName).emit("welcome");   //roomName의 모든사람에게 emit
+        socket.to(roomName).emit("welcome");   //roomName의 모든사람에게 emit
     });
+    socket.on("disconnecting", () => {
+        socket.rooms.forEach(room => socket.to(room).emit("bye")); //모든 sockt disconnect시 모든 rooms에 bye 전송
+    })
+    socket.on("new_message", (msg, room, done) => {
+        socket.to(room).emit("new_message", msg);
+        done();
+    })
 });
 
 /*
