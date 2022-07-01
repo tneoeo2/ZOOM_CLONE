@@ -24,23 +24,32 @@ function handleMessageSubmit(event){
   });
   input.value = "";
 }
+
 function handleNicknameSubmit(event){
   event.preventDefault();
+  
+  room.querySelector('#msg').hidden = false;      //메시지칸 보이게 설ㅈ정
   const input = room.querySelector("#name input");
+  // room.querySelector('#msg').hidden = false;
   socket.emit("nickname",  input.value);
 }
 
-function showRoom() {
+function showRoom(event) {
+  // welcome.hidden = true;
+  // room.hidden = false;
+  // event.preventDefault();
   welcome.hidden = true;
   room.hidden = false;
+  room.querySelector('#msg').hidden = true;   //닉네임 설정전 메시지X
   const h3 = room.querySelector("h3");
   h3.innerText = `Room ${roomName}`;
   const msgForm = room.querySelector("#msg");
-  const nameForm = room.querySelector("#name");
+  
   msgForm.addEventListener("submit", handleMessageSubmit);
-  nameForm.addEventListener("submit", handleNicknameSubmit);
+  
 
 }
+
 
 function handleRoomSubmit(event){
     event.preventDefault();
@@ -49,13 +58,13 @@ function handleRoomSubmit(event){
     //emit : event전송 (object전송가능)
     socket.emit("enter_room", input.value, showRoom);  //? emit(app)  == on(server) 같은 이름(str)
     roomName = input.value;
-
+    
     input.value = "";
-}
-
-form.addEventListener("submit", handleRoomSubmit);
-
-
+  }
+  
+  form.addEventListener("submit", handleRoomSubmit);
+  room.querySelector("#name").addEventListener("submit", handleNicknameSubmit);   //닉네임 설정  
+  
 socket.on("welcome", (user) => {
   addMessage(`${user} arrived!`);
 })

@@ -21,11 +21,16 @@ wsServer.on("connection", (socket) => {
     socket.onAny((event)=>{
         console.log(`Socket Event: ${event}`);
     });
+    socket.on("set_name", (roomName) => {    //done(client단에서 전달받은 func)
+        console.log("setID"); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
+        socket.to(roomName).emit("welcome", socket.nickname);   //roomName의 모든사람에게 emit
+        
+    });
     socket.on("enter_room", (roomName, done) => {    //done(client단에서 전달받은 func)
         // console.log(socket.id); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
         socket.join(roomName);
         done();   //함수 호출(show room!!)
-        socket.to(roomName).emit("welcome", socket.nickname);   //roomName의 모든사람에게 emit
+
     });
     socket.on("disconnecting", () => {
         socket.rooms.forEach(room => 
