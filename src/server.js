@@ -16,11 +16,35 @@ const handleListen = () => console.log('Lintening on http://localhost:3000');   
 const httpserver = http.createServer(app);      //express app로부터 서버 만들기   //? httpServer
 const wsServer = SocketIO(httpserver);   //socket.io는 websocket의 부가기능이 아니다!!
 
+/*
+ *sids: 개인방, rooms: 공개방, 개인방 
+ * rooms는 sids를 포함하고있다.
+ *   ==> 공개방을 얻고 싶을때는 rooms - sids = 공개방
+ */
+
+
+function publicRooms(){
+    const {
+        sockets:{
+            adapter:{sids, rooms},
+        },
+    } = wsServer;
+    const publicRooms = [];
+    rooms.forEach((_, key)=>{
+        if(sids.get(key) === undefined){
+            publicRooms.push(key);
+        }
+    });
+    return publicRooms;
+}
+
 wsServer.on("connection", (socket) => {
     socket["nickname"] = "Anon";
     socket.onAny((event)=>{
+        // console.log(wsServer.sockets.adapter);
         console.log(`Socket Event: ${event}`);
     });
+
     socket.on("set_name", (roomName) => {    //done(client단에서 전달받은 func)
         console.log("setID"); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
         socket.to(roomName).emit("welcome", socket.nickname);   //roomName의 모든사람에게 emit
