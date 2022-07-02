@@ -32,6 +32,7 @@ function handleNicknameSubmit(event){
   const input = room.querySelector("#name input");
   // room.querySelector('#msg').hidden = false;
   socket.emit("nickname",  input.value);
+  socket.emit("set_name", roomName);
 }
 
 function showRoom(event) {
@@ -65,11 +66,15 @@ function handleRoomSubmit(event){
   form.addEventListener("submit", handleRoomSubmit);
   room.querySelector("#name").addEventListener("submit", handleNicknameSubmit);   //닉네임 설정  
   
-socket.on("welcome", (user) => {
+socket.on("welcome", (user, newCount) => {
+  const h3 = room.querySelector("h3");
+  h3.innerText = `Room ${roomName} (${newCount})`;
   addMessage(`${user} arrived!`);
 })
 
-socket.on("bye", (left) => {
+socket.on("bye", (left, newCount) => {
+  const h3 = room.querySelector("h3");
+  h3.innerText = `Room ${roomName} (${newCount})`;
   addMessage(`${left} left!`);
 })
 

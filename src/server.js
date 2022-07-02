@@ -1,7 +1,8 @@
 import http from "http";
-import SocketIO from "socket.io";
+import {Server} from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
 import express from "express";   //express view 설정, render해주는 역할
-import { SocketAddress } from "net";
+
 
 const app = express();
 
@@ -13,8 +14,17 @@ app.get("/*", (req, res) => res.redirect("/"));  //home 외의 나머지 주소 
 const handleListen = () => console.log('Lintening on http://localhost:3000');   //? ws://localhost:3000  => ws / http 요청 둘 다 처리 가능
 // app.listen(3000, handleListen); 
 
-const httpserver = http.createServer(app);      //express app로부터 서버 만들기   //? httpServer
-const wsServer = SocketIO(httpserver);   //socket.io는 websocket의 부가기능이 아니다!!
+const httpServer = http.createServer(app);      //express app로부터 서버 만들기   //? httpServer
+const wsServer = new Server(httpServer, {
+    cors:{
+        origin: ["https://admin.socket.io"],
+        credential:true,
+    },
+});   //socket.io는 websocket의 부가기능이 아니다!!
+
+instrument(wsServer, {
+    auth: false,    //비밀번호 설정가능
+});
 
 /*
  *sids: 개인방, rooms: 공개방, 개인방 
@@ -38,6 +48,10 @@ function publicRooms(){
     return publicRooms;
 }
 
+function countRoom(roomName){
+    return wsServer.sockets.adapter.rooms.get(roomName)?.size;
+}
+
 wsServer.on("connection", (socket) => {
     socket["nickname"] = "Anon";
     socket.onAny((event)=>{
@@ -47,18 +61,19 @@ wsServer.on("connection", (socket) => {
 
     socket.on("set_name", (roomName) => {    //done(client단에서 전달받은 func)
         console.log("setID"); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
-        socket.to(roomName).emit("welcome", socket.nickname);   //roomName의 모든사람에게 emit
+        socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));   //roomName의 모든사람에게 emit
         
     });
     socket.on("enter_room", (roomName, done) => {    //done(client단에서 전달받은 func)
         // console.log(socket.id); //user id == room id  : 방이 생성되면 기본적으로 id 가짐
         socket.join(roomName);
         done();   //함수 호출(show room!!)
+        // socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));   //roomName의 모든사람에게 emit
         wsServer.sockets.emit("room_change", publicRooms())
     });
     socket.on("disconnecting", () => {
         socket.rooms.forEach(room => 
-            socket.to(room).emit("bye", socket.nickname)
+            socket.to(room).emit("bye", socket.nickname, countRoom(room)-1)
             ); //모든 sockt disconnect시 모든 rooms에 bye 전송
 
     })
