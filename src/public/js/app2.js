@@ -5,15 +5,22 @@ const muteBtn = document.getElementById("mute");
 const cameraBtn = document.getElementById("camera");
 const cameraSelect = document.getElementById("cameras");
 
+const call = document.getElementById("call");
+
+call.hidden = true;
+
 let myStream;
 let muted = false;     //디폴트 값 설정
 let cameraOff = false;
+let roomName;
+let myPeerConnection;
 
 async function getCameras() {   //user 장치 목록 얻어오기
   try{                  //promise -> trycatch 처리
     const devices = await navigator.mediaDevices.enumerateDevices();
     const cameras = devices.filter(device => device.kind === "videoinput"); //video관련기기만 추출
     const currentCamera = myStream.getVideoTracks()[0];  //최근에 선택된 카메라 찾기
+    // console.log('test: ', myStream);
     cameras.forEach(camera => {
       const option = document.createElement("option");
       option.value = camera.deviceId;   //deviceID 얻어와 value로 지정
@@ -54,8 +61,6 @@ async function getMedia(deviceId) {
 }
 
 
-getMedia();
-
 function handleMuteClick() {
   // console.log(myStream.getAudioTracks());
   myStream
@@ -92,3 +97,82 @@ async function handleCameraChange(){
 muteBtn.addEventListener("click", handleMuteClick); 
 cameraBtn.addEventListener("click", handleCameraClick);
 cameraSelect.addEventListener("input", handleCameraChange);
+
+//Welcome Form(join a room)
+const welcome = document.getElementById("welcome");
+const welcomeForm = welcome.querySelector('form');
+
+async function initCall(){
+  welcome.hidden = true;
+  call.hidden = false;
+  await getMedia(); 
+  makeConnection();
+}
+
+async function handleWelcomeSubmit(event){
+  event.preventDefault();
+  const input = welcomeForm.querySelector("input");
+  await initCall();
+  socket.emit("join_room", input.value);
+  roomName = input.value;
+  input.value = "";
+}
+
+welcomeForm.addEventListener("submit", handleWelcomeSubmit);
+
+//Socket Code
+
+socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
+  console.log('someone joined');
+  const offer = await myPeerConnection.createOffer();  //peerA offer 생성
+  myPeerConnection.setLocalDescription(offer);
+  console.log("sent the offer");
+  socket.emit("offer", offer, roomName);   //B로 offer 보냄
+});
+
+
+//? setLocalDescription  --> emit ---> on ---> setRemoteDescription    두브라우저 모두 local remote 가진다.
+socket.on("offer",  async(offer) =>{   //*peer B 브라우저에서 실행
+  console.log("received the offer");
+  myPeerConnection.setRemoteDescription(offer);
+  const answer = await myPeerConnection.createAnswer();
+  myPeerConnection.setLocalDescription(answer);
+  socket.emit("answer", answer, roomName);
+  console.log("sent the answer");
+})
+
+socket.on("answer", (answer) => {
+  console.log("received the answer");
+  myPeerConnection.setRemoteDescription(answer);
+})
+
+socket.on("ice", (ice)=>{
+  console.log("received candidate");
+  myPeerConnection.addIceCandidate(ice);
+})
+
+// RTC Code
+//각 브라우저에서 카메라 마이크 데이터 stream 받아서 연결안에 집어넣는다
+
+function makeConnection() {
+  myPeerConnection = new RTCPeerConnection();
+  myPeerConnection.addEventListener("icecandidate", handleIce);
+  myPeerConnection.addEventListener("addstream", handleAddStream);
+  myStream
+    .getTracks()
+    .forEach((track) => myPeerConnection.addTrack(track, myStream));
+}
+
+function handleIce(data){
+  console.log("sent candidate");
+  socket.emit("ice", data.candidate, roomName);
+}
+
+function handleAddStream(data){
+  const peersStream = document.getElementById("peerFace");
+  // console.log("got an stream from my peer");
+  console.log("Peer',s Stream", data.stream);
+  peersStream.srcObject = data.stream;
+  // console.log("My stream: ", myStream);
+}
+
