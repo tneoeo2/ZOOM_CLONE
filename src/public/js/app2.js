@@ -47,7 +47,7 @@ async function getMedia(deviceId) {
     video: { deviceId: { exact: deviceId }} , //특정 장치 요청
   };
   try {
-    myStream = await navigator.mediaDevices.getUserMedia(
+    myStream = await navigator.mediaDevices.getUserMedia(  //새로운 stream 만듬
       deviceId? cameraConstraints : initialConstrains   
     );
     // console.log(myStream);
@@ -90,8 +90,16 @@ function handleCameraClick() {
 
 }
 
-async function handleCameraChange(){
-  await getMedia(cameraSelect.value);
+async function handleCameraChange(){ //카메라 변경시 stream은 바뀌어도 stack가 그대로 => 다른 브라우저에는 적용 안됨
+  await getMedia(cameraSelect.value); //new Stream 만듬
+  if(myPeerConnection){
+    const videoTrack = myStream.getVideoTracks()[0];
+    const videoSender = myPeerConnection
+    .getSenders()
+    .find((sender) => sender.track.kind === "video");
+    // console.log(videoSender);
+    videoSender.replaceTrack(videoTrack);
+  }
 }
 
 muteBtn.addEventListener("click", handleMuteClick); 
