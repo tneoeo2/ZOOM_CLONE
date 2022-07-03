@@ -14,6 +14,7 @@ let muted = false;     //디폴트 값 설정
 let cameraOff = false;
 let roomName;
 let myPeerConnection;
+let myDataChannl;
 
 async function getCameras() {   //user 장치 목록 얻어오기
   try{                  //promise -> trycatch 처리
@@ -131,7 +132,9 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 //Socket Code
 
 socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
-  console.log('someone joined');
+  myDataChannl = myPeerConnection.createDataChannel("chat");
+  myDataChannl.addEventListener("message", (event) => console.log(event.data));
+  console.log("made data channel")
   const offer = await myPeerConnection.createOffer();  //peerA offer 생성
   myPeerConnection.setLocalDescription(offer);
   console.log("sent the offer");
@@ -141,6 +144,10 @@ socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
 
 //? setLocalDescription  --> emit ---> on ---> setRemoteDescription    두브라우저 모두 local remote 가진다.
 socket.on("offer",  async(offer) =>{   //*peer B 브라우저에서 실행
+  myPeerConnection.addEventListener("datachannel", (event)=>{  //datachannel 이벤트 있으면 (ex> 데이터 채널 생성)
+    myDataChannl = event.channel;
+    myDataChannl.addEventListener("message", console.log);
+  });
   console.log("received the offer");
   myPeerConnection.setRemoteDescription(offer);
   const answer = await myPeerConnection.createAnswer();
@@ -163,7 +170,19 @@ socket.on("ice", (ice)=>{
 //각 브라우저에서 카메라 마이크 데이터 stream 받아서 연결안에 집어넣는다
 
 function makeConnection() {
-  myPeerConnection = new RTCPeerConnection();
+  myPeerConnection = new RTCPeerConnection({
+    iceServers: [               //google에서 제공하는 stun서버 : request시 요청자의 공용ip주소 알려주는 서버
+      {                         // 다른 네트워크에 있는 장치들이 서로를 찾기 위함
+        urls: [
+          "stun:stun.l.google.com:19302",
+          "stun:stun1.l.google.com:19302",
+          "stun:stun2.l.google.com:19302",
+          "stun:stun3.l.google.com:19302",
+          "stun:stun4.l.google.com:19302",
+        ]
+      }
+    ]
+  });
   myPeerConnection.addEventListener("icecandidate", handleIce);
   myPeerConnection.addEventListener("addstream", handleAddStream);
   myStream
@@ -184,3 +203,10 @@ function handleAddStream(data){
   // console.log("My stream: ", myStream);
 }
 
+////????? DATA CHannel 만들기 (websocket 없이 채팅 만들기 가능해짐)
+/**
+ * peer가 많아질수록 속도 느려짐
+ *  => SFU방식 사용 : 한서버에 스트림 압축해서 보내고 각각 사양 스트림 보냄 
+ *  발표자에겐 좀 더 고사양 스트림을 보냄
+ *  ? data channel: 텍스트여서 peer많아도 빠르고 부담이 적다
+ */
