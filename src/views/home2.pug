@@ -30,11 +30,14 @@ html(lang="en")
                             video#peerFace(autoplay, playsinline, width="1000", height="1000")
 
                 div#chat
+                    div#chatHeader
+                        div#nick nickname
                     //- 기존 대화내역 리스트
-                    div#chatList 
-                    //- 내용입력및 전송버튼
-                    div#inputDiv
-                        input(placeholder="message", required, type="text")  
-                        button Send
+                    div#chatBox
+                        div#chatList
+                        div#inputDiv
+                            div
+                                textarea(placeholder="메시지 입력...", data-focus-visible-added) 
+                            button Send
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app2.js")

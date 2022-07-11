@@ -46,7 +46,16 @@ async function getCameras() {   //user 장치 목록 얻어오기
 async function getMedia(deviceId) {
   const initialConstrains = {     //ㅋㅏㅁㅔㄹㅏ초기설정(deviceId 변수없을때)
     audio: true, 
-    video: {facingMode: "user"},
+    video: {
+      mandatory: {
+        maxWidth: 160,
+        maxHeight: 120,
+        maxFrameRate: 5,
+      },
+      optional: [
+        { facingMode: 'user' },
+      ],
+    },
   };
   const cameraConstraints = {
     audio: true, 

@@ -16,7 +16,7 @@ main{
 
 #myStream{
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 #myCam{
@@ -33,14 +33,94 @@ video{
     height: auto;
 }
 
-#inputDiv{
+#chatHeader{
+    background-color: rgb(var(--ig-primary-background));
+    border: 1px solid rgb(200, 200, 200);
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    flex-wrap: wrap;
+    font-size: 16px;
+    font-weight: 600;
+    height: 60px;
+    width: 100%;
+    z-index: 2;
+}
+
+#chatBox{
+    border-left: 1px solid rgb(200, 200, 200);
+    border-right: 1px solid rgb(200, 200, 200);
+    border-bottom: 1px solid rgb(200, 200, 200);
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    -webkit-overflow-scrolling: touch;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+}
+#chatList{
+    flex: 0 1 auto;
+    padding: 20px 20px 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#nick{
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#inputDiv{
+    align-items: center;
+    border: 1px solid rgb(196, 196, 196);
+    border-radius: 22px;
+    display: flex;
+    flex-direction: row;
+    min-height: 44px;
+    padding-left: 11px;
+    padding-right: 8px;
+    margin: 5px;
+}
+#inputDiv div{
+    /* flex: 1 1 auto; */
+    max-height: 10%;
+    min-height: 0;
+    min-width: 0;
+}
+#inputDiv textarea{
+    height: 16px !important;
+    background-color: transparent;
+    border: none;
+    overflow: auto;
+    padding: 8px 9px;
+    resize: none;
+    writing-mode: horizontal-tb !important;
+    margin: 0;
+}
+#inputDiv textarea:focus{
+   outline: none;
+    
+}
+#inputDiv button{
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    padding: 8px;
 }
 
 #chat{
     padding: 10px;
-    background-color: skyblue;
+    /* background-color: skyblue; */
+    align-items: stretch;
+    border: 0 solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 #chatList{
