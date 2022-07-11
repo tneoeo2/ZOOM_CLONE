@@ -109,7 +109,7 @@ wss.on("connection", (socket) =>{
     });      //브라우저에서 보내기
 });
  */
-httpserver.listen(3000, handleListen);
+httpServer.listen(3000, handleListen);
 
 {
     type:"message";

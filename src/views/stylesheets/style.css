@@ -1,0 +1,49 @@
+main{
+    margin: 0;
+    width: 100%;
+    padding: 0;
+    max-width:100%
+}
+
+#room{
+    display: flex;
+}
+
+#call{
+    width: 70%;
+    margin-left: 5%;
+}
+
+#myStream{
+    display: flex;
+    flex-direction: row;
+}
+
+#myCam{
+    margin: 2%;
+}
+
+#peerCam{
+    margin: 2%;
+}
+
+video{
+    max-width: 1000px;
+    width: 100%;
+    height: auto;
+}
+
+#inputDiv{
+    display: flex;
+    align-items: baseline;
+}
+
+#chat{
+    padding: 10px;
+    background-color: skyblue;
+}
+
+#chatList{
+    height: 90%;
+}
+

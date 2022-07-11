@@ -6,6 +6,8 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title Noom 
         link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+        style 
+            include stylesheets/style.css
     body 
         header
             h1 Noom
@@ -14,12 +16,25 @@ html(lang="en")
                 form 
                     input(placeholder="room name", required, type="text")
                     button Enter Room
-            div#call
-                div#myStream 
-                    video#myFace(autoplay, playsinline, width="400", height="400")
-                    button#mute Mute
-                    button#camera Turn Camera Off
-                    select#cameras
-                video#peerFace(autoplay, playsinline, width="400", height="400")
+            div#room   
+                div#call
+                    div#myStream 
+                        div#myCam 
+                            video#myFace(autoplay, playsinline, width="1000", height="1000")
+                            div#camSet
+                                button#mute Mute
+                                button#camera Turn Camera Off
+                                button#viewChange Show Screen
+                                select#cameras
+                        div#peerCam        
+                            video#peerFace(autoplay, playsinline, width="1000", height="1000")
+
+                div#chat
+                    //- 기존 대화내역 리스트
+                    div#chatList 
+                    //- 내용입력및 전송버튼
+                    div#inputDiv
+                        input(placeholder="message", required, type="text")  
+                        button Send
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app2.js")

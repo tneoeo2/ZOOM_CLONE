@@ -4,6 +4,9 @@ const myFace = document.getElementById("myFace");
 const muteBtn = document.getElementById("mute");
 const cameraBtn = document.getElementById("camera");
 const cameraSelect = document.getElementById("cameras");
+const viewChange = document.getElementById("viewChange");   //캠 <-> PC화면 전환버튼
+const chat = document.getElementById("chat");   //채팅방
+
 
 const call = document.getElementById("call");
 
@@ -15,6 +18,8 @@ let cameraOff = false;
 let roomName;
 let myPeerConnection;
 let myDataChannl;
+
+
 
 async function getCameras() {   //user 장치 목록 얻어오기
   try{                  //promise -> trycatch 처리
@@ -51,7 +56,7 @@ async function getMedia(deviceId) {
     myStream = await navigator.mediaDevices.getUserMedia(  //새로운 stream 만듬
       deviceId? cameraConstraints : initialConstrains   
     );
-    // console.log(myStream);
+    console.log("myStream: ", myStream);
     myFace.srcObject = myStream;
     if(!deviceId){   //처음에만 실행되게 변경
       await getCameras();
@@ -61,6 +66,9 @@ async function getMedia(deviceId) {
   }
 }
 
+function hadleViewClick(){
+
+}
 
 function handleMuteClick() {
   // console.log(myStream.getAudioTracks());
