@@ -19,11 +19,11 @@ main{
     flex-wrap: wrap;
 }
 
-#myCam{
+#myFace{
     margin: 2%;
 }
 
-#peerCam{
+#peerFace{
     margin: 2%;
 }
 
@@ -32,6 +32,7 @@ video{
     width: 100%;
     height: auto;
 }
+
 
 #chatHeader{
     background-color: rgb(var(--ig-primary-background));

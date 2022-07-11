@@ -218,6 +218,7 @@ function handleAddStream(data){
   console.log("Peer',s Stream", data.stream);
   peersStream.srcObject = data.stream;
   // console.log("My stream: ", myStream);
+  
 }
 
 ////????? DATA CHannel 만들기 (websocket 없이 채팅 만들기 가능해짐)
