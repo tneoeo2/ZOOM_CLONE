@@ -4,9 +4,8 @@ const myFace = document.getElementById("myFace");
 const muteBtn = document.getElementById("mute");
 const cameraBtn = document.getElementById("camera");
 const cameraSelect = document.getElementById("cameras");
-const viewChange = document.getElementById("viewChange");   //캠 <-> PC화면 전환버튼
-const chat = document.getElementById("chat");   //채팅방
-
+const msgBtn = document.querySelector("#inputDiv button");
+const chatList = document.getElementById("chatList");
 
 const call = document.getElementById("call");
 
@@ -18,7 +17,6 @@ let cameraOff = false;
 let roomName;
 let myPeerConnection;
 let myDataChannl;
-
 
 
 async function getCameras() {   //user 장치 목록 얻어오기
@@ -75,9 +73,6 @@ async function getMedia(deviceId) {
   }
 }
 
-function hadleViewClick(){
-
-}
 
 function handleMuteClick() {
   // console.log(myStream.getAudioTracks());
@@ -124,6 +119,7 @@ muteBtn.addEventListener("click", handleMuteClick);
 cameraBtn.addEventListener("click", handleCameraClick);
 cameraSelect.addEventListener("input", handleCameraChange);
 
+
 //Welcome Form(join a room)
 const welcome = document.getElementById("welcome");
 const welcomeForm = welcome.querySelector('form');
@@ -144,13 +140,39 @@ async function handleWelcomeSubmit(event){
   input.value = "";
 }
 
+function submitTextarea(){
+    console.log("focusing!!!!")
+    window.addEventListener("keydown", (e) => {
+    console.log("keydown!!!!", e, e.key);
+        if (e.key === "Enter"){  //13 == Enter
+            document.querySelector("#inputDiv button").click();
+        }
+    });
+}
+
+
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 //Socket Code
+document.querySelector("#inputDiv button").addEventListener("click", handleMsgBtn);
+document.querySelector("#inputDiv textarea").addEventListener("focus", submitTextarea);
+
+function handleMsgBtn(){
+  console.log("메시지 전송!");
+  let msg = document.querySelector("#inputDiv textarea").value;
+  tmpDiv = document.createElement("div");
+  chatList.insertAdjacentElement("afterEnd", tmpDiv);
+  tmpDiv.innerText = msg;
+  
+  myDataChannl.sender(msg);
+  
+  msg.value = "전송완료!!!";
+  
+}
 
 socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
   myDataChannl = myPeerConnection.createDataChannel("chat");
-  myDataChannl.addEventListener("message", (event) => console.log(event.data));
+  myDataChannl.addEventListener("message", (event) => handleMsgBtn);   //메시지오면 이벤트 실행
   console.log("made data channel")
   const offer = await myPeerConnection.createOffer();  //peerA offer 생성
   myPeerConnection.setLocalDescription(offer);
