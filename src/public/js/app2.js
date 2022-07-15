@@ -16,7 +16,7 @@ let muted = false;     //디폴트 값 설정
 let cameraOff = false;
 let roomName;
 let myPeerConnection;
-let myDataChannl;
+let myDataChannel;
 
 
 async function getCameras() {   //user 장치 목록 얻어오기
@@ -143,7 +143,7 @@ async function handleWelcomeSubmit(event){
 function submitTextarea(){
     console.log("focusing!!!!")
     window.addEventListener("keydown", (e) => {
-    console.log("keydown!!!!", e, e.key);
+    // console.log("keydown!!!!", e, e.key);
         if (e.key === "Enter"){  //13 == Enter
             document.querySelector("#inputDiv button").click();
         }
@@ -157,22 +157,33 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 document.querySelector("#inputDiv button").addEventListener("click", handleMsgBtn);
 document.querySelector("#inputDiv textarea").addEventListener("focus", submitTextarea);
 
-function handleMsgBtn(){
+
+function handleMsgBtn(){   //sent 버튼 클릭시 실행
   console.log("메시지 전송!");
   let msg = document.querySelector("#inputDiv textarea").value;
   tmpDiv = document.createElement("div");
   chatList.insertAdjacentElement("afterEnd", tmpDiv);
-  tmpDiv.innerText = msg;
-  
-  myDataChannl.sender(msg);
-  
-  msg.value = "전송완료!!!";
+  // console.log("data: ", event.data);
+  // tmpDiv.innerText =  "recieve_data__-" + event.data;
+  tmpDiv.innerText =  msg;
+  myDataChannel.send(msg);
+  document.querySelector("#inputDiv textarea").value = "";
+  console.log("textArea 비우기")
   
 }
 
+
 socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
-  myDataChannl = myPeerConnection.createDataChannel("chat");
-  myDataChannl.addEventListener("message", (event) => handleMsgBtn);   //메시지오면 이벤트 실행
+  myDataChannel = myPeerConnection.createDataChannel("chat");
+  // myDataChannel.addEventListener("message", (event) => console.log(event.data));   //메시지오면 이벤트 실행
+  myDataChannel.addEventListener("message", (event) => {
+    console.log(event.data);
+    tmpDiv = document.createElement("div");
+    chatList.insertAdjacentElement("afterEnd", tmpDiv);
+    tmpDiv.innerText = event.data;
+    myDataChannel.send(event.data);
+    document.querySelector("#inputDiv textarea").value = "";
+  } );   //메시지오면 이벤트 실행
   console.log("made data channel")
   const offer = await myPeerConnection.createOffer();  //peerA offer 생성
   myPeerConnection.setLocalDescription(offer);
@@ -184,8 +195,9 @@ socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
 //? setLocalDescription  --> emit ---> on ---> setRemoteDescription    두브라우저 모두 local remote 가진다.
 socket.on("offer",  async(offer) =>{   //*peer B 브라우저에서 실행
   myPeerConnection.addEventListener("datachannel", (event)=>{  //datachannel 이벤트 있으면 (ex> 데이터 채널 생성)
-    myDataChannl = event.channel;
-    myDataChannl.addEventListener("message", console.log);
+    myDataChannel = event.channel;
+    myDataChannel.addEventListener("message", console.log);
+    // myDataChannel.addEventListener("message", handleMsgBtn(event));
   });
   console.log("received the offer");
   myPeerConnection.setRemoteDescription(offer);
