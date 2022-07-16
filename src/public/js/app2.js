@@ -168,7 +168,7 @@ function handleMsgBtn(){   //sent 버튼 클릭시 실행
   tmpDiv.innerText =  msg;
   myDataChannel.send(msg);
   document.querySelector("#inputDiv textarea").value = "";
-  console.log("textArea 비우기")
+  // console.log("textArea 비우기")
   
 }
 
@@ -177,12 +177,10 @@ socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
   myDataChannel = myPeerConnection.createDataChannel("chat");
   // myDataChannel.addEventListener("message", (event) => console.log(event.data));   //메시지오면 이벤트 실행
   myDataChannel.addEventListener("message", (event) => {
-    console.log(event.data);
+    console.log('host입니다.---', event.data);
     tmpDiv = document.createElement("div");
     chatList.insertAdjacentElement("afterEnd", tmpDiv);
     tmpDiv.innerText = event.data;
-    myDataChannel.send(event.data);
-    document.querySelector("#inputDiv textarea").value = "";
   } );   //메시지오면 이벤트 실행
   console.log("made data channel")
   const offer = await myPeerConnection.createOffer();  //peerA offer 생성
@@ -196,7 +194,14 @@ socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
 socket.on("offer",  async(offer) =>{   //*peer B 브라우저에서 실행
   myPeerConnection.addEventListener("datachannel", (event)=>{  //datachannel 이벤트 있으면 (ex> 데이터 채널 생성)
     myDataChannel = event.channel;
-    myDataChannel.addEventListener("message", console.log);
+    myDataChannel.addEventListener("message", (event) =>{
+      console.log;
+      console.log("guest입니다.---", event.data)
+      tmpDiv = document.createElement("div");
+      chatList.insertAdjacentElement("afterEnd", tmpDiv);
+      tmpDiv.innerText = event.data;
+      
+    });
     // myDataChannel.addEventListener("message", handleMsgBtn(event));
   });
   console.log("received the offer");
