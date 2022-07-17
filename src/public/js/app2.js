@@ -165,7 +165,7 @@ function handleMsgBtn(){   //sent 버튼 클릭시 실행
   chatList.insertAdjacentElement("afterEnd", tmpDiv);
   // console.log("data: ", event.data);
   // tmpDiv.innerText =  "recieve_data__-" + event.data;
-  tmpDiv.innerText =  msg;
+  tmpDiv.innerText =  "나\n" + msg;
   myDataChannel.send(msg);
   document.querySelector("#inputDiv textarea").value = "";
   // console.log("textArea 비우기")
@@ -180,7 +180,7 @@ socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
     console.log('host입니다.---', event.data);
     tmpDiv = document.createElement("div");
     chatList.insertAdjacentElement("afterEnd", tmpDiv);
-    tmpDiv.innerText = event.data;
+    tmpDiv.innerText = "guest_nick\n" + event.data;       //gueest가 받아봄
   } );   //메시지오면 이벤트 실행
   console.log("made data channel")
   const offer = await myPeerConnection.createOffer();  //peerA offer 생성
@@ -199,7 +199,7 @@ socket.on("offer",  async(offer) =>{   //*peer B 브라우저에서 실행
       console.log("guest입니다.---", event.data)
       tmpDiv = document.createElement("div");
       chatList.insertAdjacentElement("afterEnd", tmpDiv);
-      tmpDiv.innerText = event.data;
+      tmpDiv.innerText = "guest_nick\n" + event.data;
       
     });
     // myDataChannel.addEventListener("message", handleMsgBtn(event));
