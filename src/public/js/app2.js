@@ -171,7 +171,7 @@ function handleMsgBtn(){   //sent 버튼 클릭시 실행
   // console.log("textArea 비우기")
   
 }
-
+//test
 
 socket.on("welcome", async() => {  //*peer A브라우저 에서 실행
   myDataChannel = myPeerConnection.createDataChannel("chat");
