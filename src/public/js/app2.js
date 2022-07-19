@@ -145,7 +145,7 @@ function submitTextarea(){
     window.addEventListener("keydown", (e) => {
     // console.log("keydown!!!!", e, e.key);
         if (e.key === "Enter"){  //13 == Enter
-            document.querySelector("#inputDiv button").click();
+          document.querySelector("#inputDiv button").click();
         }
     });
 }
@@ -161,15 +161,21 @@ document.querySelector("#inputDiv textarea").addEventListener("focus", submitTex
 function handleMsgBtn(){   //sent 버튼 클릭시 실행
   console.log("메시지 전송!");
   let msg = document.querySelector("#inputDiv textarea").value;
-  tmpDiv = document.createElement("div");
-  chatList.insertAdjacentElement("afterEnd", tmpDiv);
-  // console.log("data: ", event.data);
-  // tmpDiv.innerText =  "recieve_data__-" + event.data;
-  tmpDiv.innerText =  "나\n" + msg;
-  myDataChannel.send(msg);
-  document.querySelector("#inputDiv textarea").value = "";
-  // console.log("textArea 비우기")
   
+  if (msg.replace(/\s|　/gi, "").length == 0){
+    // msg = msg.replace("\n", '') ;
+    document.querySelector("#inputDiv textarea").value = '';
+  }else{
+    tmpDiv = document.createElement("div");
+    chatList.insertAdjacentElement("afterEnd", tmpDiv);
+    // console.log("data: ", event.data);
+    // tmpDiv.innerText =  "recieve_data__-" + event.data;
+    tmpDiv.innerText =  "나\n" + msg;
+    myDataChannel.send(msg);
+    document.querySelector("#inputDiv textarea").value = '';
+  }
+  
+  // console.log("textArea 비우기")
 }
 //test
 
